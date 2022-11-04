@@ -2,6 +2,7 @@ package com.example.musicplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
 
+
         titleTv = findViewById(R.id.song_title);
         currentTimeTv = findViewById(R.id.current_time);
         totalTimeTv = findViewById(R.id.total_time);
@@ -44,9 +46,15 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         setResourcesWithMusic();
 
+
+
         MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+
+
             @Override
             public void run() {
+
+
                 if(mediaPlayer!=null){
                     seekBar.setProgress(mediaPlayer.getCurrentPosition());
                     currentTimeTv.setText(convertToMMSS(mediaPlayer.getCurrentPosition()+""));
@@ -97,7 +105,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
         nextBtn.setOnClickListener(v-> playNextSong());
         previousBtn.setOnClickListener(v-> playPreviousSong());
 
+
         playMusic();
+        initMediaPlayer();
 
 
     }
@@ -118,6 +128,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
 
     }
+
 
     private void playNextSong(){
 
@@ -143,6 +154,27 @@ public class MusicPlayerActivity extends AppCompatActivity {
         else
             mediaPlayer.start();
     }
+    void initMediaPlayer() {
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                try {
+
+                    playNextSong();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        try {
+            playMusic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 
     public static String convertToMMSS(String duration){
@@ -151,4 +183,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
     }
+
+
+
 }
